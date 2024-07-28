@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Lobbies {
+  code               String?
+  createdAt          DateTime      @default(now())
+  host               String?
+  hostId             String?
+  hostUser           String?
+  id                 String        @id @default(cuid())
+  lobbiesQuizPackage String?
+  name               String?
+  quizPackage        QuizPackages? @relation(fields: [quizPackageId], references: [id])
+  quizPackageId      String?
+  updatedAt          DateTime      @updatedAt
+  userLobbiesItems   UserLobbies[]
+}
+
+model QuizPackages {
+  createdAt    DateTime  @default(now())
+  description  String?
+  id           String    @id @default(cuid())
+  lobbiesItems Lobbies[]
+  name         String?
+  topicsItems  Topics[]
+  updatedAt    DateTime  @updatedAt
+}
+
+model Questions {
+  correctAnswer String?
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  questionTopic String?
+  text          String?
+  topic         Topics?  @relation(fields: [topicId], references: [id])
+  topicId       String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Topics {
+  createdAt        DateTime      @default(now())
+  description      String?
+  id               String        @id @default(cuid())
+  name             String?
+  packageId        String?
+  questionsItems   Questions[]
+  quizPackage      QuizPackages? @relation(fields: [quizPackageId], references: [id])
+  quizPackageId    String?
+  topicQuizPackage String?
+  updatedAt        DateTime      @updatedAt
+}
+
+model UserLobbies {
+  createdAt        DateTime @default(now())
+  id               String   @id @default(cuid())
+  lobby            Lobbies? @relation(fields: [lobbyId], references: [id])
+  lobbyId          String?
+  updatedAt        DateTime @updatedAt
+  user             User?    @relation(fields: [userId], references: [id])
+  userId           String?
+  userLobbiesLobby String?
+  userLobbiesUser  String?
+}
+
+model User {
+  createdAt        DateTime      @default(now())
+  email            String?       @unique
+  firstName        String?
+  id               String        @id @default(cuid())
+  lastName         String?
+  password         String
+  roles            Json
+  updatedAt        DateTime      @updatedAt
+  userLobbiesItems UserLobbies[]
+  username         String        @unique
+}
